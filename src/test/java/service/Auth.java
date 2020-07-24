@@ -26,7 +26,20 @@ public class Auth {
                 .body(bodyUserPassword).contentType(ContentType.JSON)
                 .when()
                 .post(EndPoint.AUTH)
-                .then().extract().response();
+                .prettyPeek();
     }
 
+    public static String getToken() {
+
+        String bodyUserPassword = "{\n" +
+                "    \"username\" : \"admin\",\n" +
+                "    \"password\" : \"password123\"\n" +
+                "}";
+
+        return given()
+                .body(bodyUserPassword).contentType(ContentType.JSON)
+                .when()
+                .post(EndPoint.AUTH)
+                .then().extract().jsonPath().getString("token");
+    }
 }
