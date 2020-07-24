@@ -48,12 +48,13 @@ public class TestSuite extends TestConf {
     }
 
     @Test
-    public void getBookingIdWithName() {
+    public void getBookingWithName() {
 
         Response response = given()
-                .pathParam("fn", "Susan")
+                .pathParam("fn", "Mary")
+                .pathParam("ln", "Jackson")
                 .when()
-                .get(EndPoint.BOOKING + "?firstname={fn}" )
+                .get(EndPoint.BOOKING + "?firstname={fn}&lastname={ln}" )
                 .prettyPeek();
 
         assertThat(response.statusCode(), equalTo(200));
@@ -61,8 +62,44 @@ public class TestSuite extends TestConf {
     }
 
     @Test
-    public void getWrongBookingIdWithName() {
+    public void getWrongBookingWithName() {
+        Response response = given()
+                .pathParam("fn", "zvs13s1v5s4f")
+                .pathParam("ln", "as4h8s9v5n27")
+                .when()
+                .get(EndPoint.BOOKING + "?firstname={fn}&lastname={ln}" )
+                .prettyPeek();
 
+        assertThat(response.statusCode(), equalTo(200));
+        assertThat(response.jsonPath().getList("bookingid").size(), is(0));
+    }
+
+    @Test
+    public void getBookingWithDate() {
+
+        Response response = given()
+                .pathParam("ci", "2017-11-19")
+                .pathParam("co", "2019-11-11")
+                .when()
+                .get(EndPoint.BOOKING + "?checkin={ci}&checkout={co}" )
+                .prettyPeek();
+
+        assertThat(response.statusCode(), equalTo(200));
+        assertThat(response.jsonPath().getList("bookingid").contains(1), equalTo(true));
+    }
+
+    @Test
+    public void getWrongBookingWithDate() {
+
+        Response response = given()
+                .pathParam("fn", "9999-01-01")
+                .pathParam("ln", "1111-01-01")
+                .when()
+                .get(EndPoint.BOOKING + "?checkin={fn}&checkout={ln}" )
+                .prettyPeek();
+
+        assertThat(response.statusCode(), equalTo(200));
+        assertThat(response.jsonPath().getList("bookingid").size(), is(0));
     }
 
     @Test
@@ -106,7 +143,7 @@ public class TestSuite extends TestConf {
                 "}";
 
         Response response = given()
-                .body(bodyNewBooking).pathParam("bookingId", 1)
+                .body(bodyNewBooking).pathParam("bookingId", 2)
                 .cookie("token", Auth.getToken())
                 .when()
                 .put(EndPoint.SINGLE_BOOKING)
@@ -126,7 +163,7 @@ public class TestSuite extends TestConf {
                 "}";
 
         Response response = given()
-                .body(bodyNewBooking).pathParam("bookingId", 1)
+                .body(bodyNewBooking).pathParam("bookingId", 2)
                 .cookie("token", Auth.getToken())
                 .when()
                 .patch(EndPoint.SINGLE_BOOKING)
@@ -143,12 +180,11 @@ public class TestSuite extends TestConf {
 
         Response response = given()
                 .cookie("token", Auth.getToken())
-                .pathParam("bookingId", 9)
+                .pathParam("bookingId", 12)
                 .when()
                 .delete(EndPoint.SINGLE_BOOKING)
                 .prettyPeek();
         assertThat(response.statusCode(), equalTo(201));
-//        assertThat(response.getStatusLine().split(" ")[2], equalTo("Created"));
     }
 
 
@@ -163,7 +199,6 @@ public class TestSuite extends TestConf {
                 .prettyPeek();
 
         assertThat(response.statusCode(), equalTo(405));
-//        assertThat(response.getStatusLine().endsWith("Method Not Allowed"), equalTo(true));
     }
 }
 

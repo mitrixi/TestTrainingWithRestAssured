@@ -10,6 +10,7 @@ import org.junit.BeforeClass;
 
 public class TestConf {
     public static RequestSpecification restfulbooker_requestSpec;
+    public static RequestSpecification restfulbookerLocal_requestSpec;
     public static ResponseSpecification responseSpec;
 
     @BeforeClass
@@ -22,11 +23,17 @@ public class TestConf {
                 .log(LogDetail.ALL)
                 .build();
 
-        RestAssured.requestSpecification = restfulbooker_requestSpec;
+        restfulbookerLocal_requestSpec = new RequestSpecBuilder()
+                .setBaseUri("http://localhost:3001")
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .log(LogDetail.ALL)
+                .build();
+
+        RestAssured.requestSpecification = restfulbookerLocal_requestSpec;
 
         responseSpec = new ResponseSpecBuilder()
-//                .expectStatusCode(200)
-                .log(LogDetail.ALL)
+//                .log(LogDetail.ALL)
                 .build();
 
         RestAssured.responseSpecification = responseSpec;
