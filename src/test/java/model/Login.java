@@ -3,7 +3,6 @@ package model;
 public class Login {
     private String username;
     private String password;
-    private String token;
 
     public Login setUsername(String username) {
         this.username = username;
@@ -15,11 +14,10 @@ public class Login {
         return this;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
+    public String getJson() {
+        return "{\n" +
+                "    \"username\" : \"" + username + "\",\n " +
+                "    \"password\" : \"" + password + "\"\n" +
+                "}";
     }
 }

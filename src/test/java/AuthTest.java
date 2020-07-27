@@ -1,7 +1,9 @@
+import config.SmokeTest;
 import config.TestConf;
 import io.restassured.response.Response;
 import model.Login;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import service.Auth;
 
 import static io.restassured.RestAssured.*;
@@ -12,6 +14,7 @@ public class AuthTest extends TestConf {
 
     Auth auth = new Auth(requestSpecification);
 
+    @Category(SmokeTest.class)
     @Test
     public void successAuth() {
         Login admin = new Login()

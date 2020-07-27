@@ -8,10 +8,13 @@ version '1.0-SNAPSHOT'
 repositories {
     mavenCentral()
 }
-
 test {
     useJUnit() {
-
+        testLogging.showStandardStreams = true
+        if (project.hasProperty("category"))
+            includeCategories "config.$category"
+        if (project.hasProperty("url"))
+            systemProperty "url", "$url"
     }
 }
 

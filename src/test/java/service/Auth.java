@@ -10,34 +10,32 @@ import static io.restassured.RestAssured.given;
 
 public class Auth {
     private final RequestSpecification reqSpec;
+    private Login login;
 
     public Auth(RequestSpecification reqSpec) {
         this.reqSpec = reqSpec;
     }
 
     public Response authAs(Login login) {
-
-        String bodyUserPassword = "{\n" +
-                "    \"username\" : \"" + login.getUsername() + "\",\n" +
-                "    \"password\" : \"" + login.getPassword() + "\"\n" +
-                "}";
-
+        this.login = login;
         return given()
-                .body(bodyUserPassword).contentType(ContentType.JSON)
+                .body(login.getJson())
                 .when()
                 .post(EndPoint.AUTH)
                 .prettyPeek();
     }
 
-    public static String getToken() {
+    public void setLogin(Login login) {
+        this.login = login;
+        given()
+                .body(login.getJson())
+                .when()
+                .post(EndPoint.AUTH);
+    }
 
-        String bodyUserPassword = "{\n" +
-                "    \"username\" : \"admin\",\n" +
-                "    \"password\" : \"password123\"\n" +
-                "}";
-
+    public String getToken() {
         return given()
-                .body(bodyUserPassword).contentType(ContentType.JSON)
+                .body(login.getJson())
                 .when()
                 .post(EndPoint.AUTH)
                 .then().extract().jsonPath().getString("token");

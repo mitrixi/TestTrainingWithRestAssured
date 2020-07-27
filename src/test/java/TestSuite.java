@@ -1,8 +1,13 @@
 import config.EndPoint;
+import config.SmokeTest;
 import config.TestConf;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
+import model.Booking;
+import model.Login;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import service.Auth;
 
 import static io.restassured.RestAssured.*;
@@ -12,6 +17,17 @@ import static org.hamcrest.Matchers.*;
 
 public class TestSuite extends TestConf {
 
+    private static Auth auth;
+
+    @BeforeClass
+    public static void authorization() {
+        auth = new Auth(requestSpecification);
+        auth.setLogin(new Login()
+                .setUsername("admin")
+                .setPassword("password123"));
+    }
+
+    @Category(SmokeTest.class)
     @Test
     public void getBookingIds() {
 
@@ -23,7 +39,7 @@ public class TestSuite extends TestConf {
         assertThat(response.jsonPath().getString("bookingid"), notNullValue());
     }
 
-
+    @Category(SmokeTest.class)
     @Test
     public void getBooking() {
         Response response = given()
@@ -34,7 +50,6 @@ public class TestSuite extends TestConf {
 
         assertThat(response.statusCode(), equalTo(200));
     }
-
 
     @Test
     public void getWrongBooking() {
@@ -51,10 +66,10 @@ public class TestSuite extends TestConf {
     public void getBookingWithName() {
 
         Response response = given()
-                .pathParam("fn", "Mary")
-                .pathParam("ln", "Jackson")
+                .queryParam("firstname", "Mary")
+                .queryParam("lastname", "Jackson")
                 .when()
-                .get(EndPoint.BOOKING + "?firstname={fn}&lastname={ln}" )
+                .get(EndPoint.BOOKING)
                 .prettyPeek();
 
         assertThat(response.statusCode(), equalTo(200));
@@ -67,7 +82,7 @@ public class TestSuite extends TestConf {
                 .pathParam("fn", "zvs13s1v5s4f")
                 .pathParam("ln", "as4h8s9v5n27")
                 .when()
-                .get(EndPoint.BOOKING + "?firstname={fn}&lastname={ln}" )
+                .get(EndPoint.BOOKING + "?firstname={fn}&lastname={ln}")
                 .prettyPeek();
 
         assertThat(response.statusCode(), equalTo(200));
@@ -78,10 +93,10 @@ public class TestSuite extends TestConf {
     public void getBookingWithDate() {
 
         Response response = given()
-                .pathParam("ci", "2017-11-19")
-                .pathParam("co", "2019-11-11")
+                .queryParam("checkin", "2017-11-19")
+                .queryParam("checkout", "2019-11-11")
                 .when()
-                .get(EndPoint.BOOKING + "?checkin={ci}&checkout={co}" )
+                .get(EndPoint.BOOKING)
                 .prettyPeek();
 
         assertThat(response.statusCode(), equalTo(200));
@@ -92,33 +107,31 @@ public class TestSuite extends TestConf {
     public void getWrongBookingWithDate() {
 
         Response response = given()
-                .pathParam("fn", "9999-01-01")
-                .pathParam("ln", "1111-01-01")
+                .queryParam("checkin", "9999-01-01")
+                .queryParam("checkout", "1111-01-01")
                 .when()
-                .get(EndPoint.BOOKING + "?checkin={fn}&checkout={ln}" )
+                .get(EndPoint.BOOKING)
                 .prettyPeek();
 
         assertThat(response.statusCode(), equalTo(200));
         assertThat(response.jsonPath().getList("bookingid").size(), is(0));
     }
 
+    @Category(SmokeTest.class)
     @Test
     public void createBooking() {
 
-        String bodyNewBooking = "{\n" +
-                "    \"firstname\" : \"Jim\",\n" +
-                "    \"lastname\" : \"Brown\",\n" +
-                "    \"totalprice\" : 111,\n" +
-                "    \"depositpaid\" : true,\n" +
-                "    \"bookingdates\" : {\n" +
-                "        \"checkin\" : \"2018-01-01\",\n" +
-                "        \"checkout\" : \"2019-01-01\"\n" +
-                "    },\n" +
-                "    \"additionalneeds\" : \"Breakfast\"\n" +
-                "}";
+        String jsonBooking = new Booking()
+                .setFirstname("Jim")
+                .setLastname("Brown")
+                .setTotalprice(111)
+                .setDepositpaid(true)
+                .setBookingdates("2018-01-01", "2019-01-01")
+                .setAdditionalneeds("Breakfast")
+                .getJsonBooking();
 
         Response response = given()
-                .body(bodyNewBooking)
+                .body(jsonBooking)
                 .when()
                 .post(EndPoint.BOOKING)
                 .prettyPeek();
@@ -126,73 +139,69 @@ public class TestSuite extends TestConf {
         assertThat(response.statusCode(), equalTo(200));
     }
 
-
+    @Category(SmokeTest.class)
     @Test
     public void putUpdateBooking() {
 
-        String bodyNewBooking = "{\n" +
-                "    \"firstname\": \"James\",\n" +
-                "    \"lastname\": \"Brown\",\n" +
-                "    \"totalprice\": 111,\n" +
-                "    \"depositpaid\": true,\n" +
-                "    \"bookingdates\": {\n" +
-                "        \"checkin\": \"2018-01-01\",\n" +
-                "        \"checkout\": \"2019-01-01\"\n" +
-                "    },\n" +
-                "    \"additionalneeds\": \"Breakfast\"\n" +
-                "}";
+        String jsonBooking = new Booking()
+                .setFirstname("James")
+                .setLastname("Brown")
+                .setTotalprice(111)
+                .setDepositpaid(true)
+                .setBookingdates("2018-01-01", "2019-01-01")
+                .setAdditionalneeds("Breakfast")
+                .getJsonBooking();
 
         Response response = given()
-                .body(bodyNewBooking).pathParam("bookingId", 2)
-                .cookie("token", Auth.getToken())
+                .body(jsonBooking).pathParam("bookingId", 2)
+                .cookie("token", auth.getToken())
                 .when()
                 .put(EndPoint.SINGLE_BOOKING)
                 .prettyPeek();
 
         assertThat(response.statusCode(), equalTo(200));
-        assertThat(response.body().prettyPrint(), equalTo(bodyNewBooking));
+        assertThat(response.body().prettyPrint(), equalTo(jsonBooking));
     }
 
-
+    @Category(SmokeTest.class)
     @Test
     public void patchUpdateBooking() {
 
-        String bodyNewBooking = "{\n" +
-                "    \"firstname\": \"foo\",\n" +
-                "    \"lastname\": \"bar\"\n" +
-                "}";
+        String jsonBooking = new Booking()
+                .setFirstname("foo")
+                .setLastname("bar")
+                .getJsonBooking();
 
         Response response = given()
-                .body(bodyNewBooking).pathParam("bookingId", 2)
-                .cookie("token", Auth.getToken())
+                .body(jsonBooking).pathParam("bookingId", 2)
+                .cookie("token", auth.getToken())
                 .when()
                 .patch(EndPoint.SINGLE_BOOKING)
                 .prettyPeek();
 
         assertThat(response.statusCode(), equalTo(200));
-        assertThat(response.jsonPath().getString("firstname"), equalTo(JsonPath.from(bodyNewBooking).getString("firstname")));
-        assertThat(response.jsonPath().getString("lastname"), equalTo(JsonPath.from(bodyNewBooking).getString("lastname")));
+        assertThat(response.jsonPath().getString("firstname"), equalTo(JsonPath.from(jsonBooking).getString("firstname")));
+        assertThat(response.jsonPath().getString("lastname"), equalTo(JsonPath.from(jsonBooking).getString("lastname")));
     }
 
-
+    @Category(SmokeTest.class)
     @Test
     public void deleteBooking() {
 
         Response response = given()
-                .cookie("token", Auth.getToken())
-                .pathParam("bookingId", 12)
+                .cookie("token", auth.getToken())
+                .pathParam("bookingId", 10)
                 .when()
                 .delete(EndPoint.SINGLE_BOOKING)
                 .prettyPeek();
         assertThat(response.statusCode(), equalTo(201));
     }
 
-
     @Test
     public void deleteNonexistentBooking() {
 
         Response response = given()
-                .cookie("token", Auth.getToken())
+                .cookie("token", auth.getToken())
                 .pathParam("bookingId", Integer.MAX_VALUE)
                 .when()
                 .delete(EndPoint.SINGLE_BOOKING)
