@@ -4,6 +4,7 @@ import config.TestConf;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import model.Booking;
+import model.Bookingdates;
 import model.Login;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,7 +22,7 @@ public class TestSuite extends TestConf {
 
     @BeforeClass
     public static void authorization() {
-        auth = new Auth(requestSpecification);
+        auth = new Auth();
         auth.setLogin(new Login()
                 .setUsername("admin")
                 .setPassword("password123"));
@@ -121,17 +122,16 @@ public class TestSuite extends TestConf {
     @Test
     public void createBooking() {
 
-        String jsonBooking = new Booking()
+        Booking booking = new Booking()
                 .setFirstname("Jim")
                 .setLastname("Brown")
                 .setTotalprice(111)
                 .setDepositpaid(true)
-                .setBookingdates("2018-01-01", "2019-01-01")
-                .setAdditionalneeds("Breakfast")
-                .getJsonBooking();
+                .setBookingdates(new Bookingdates("2018-01-01", "2019-01-01"))
+                .setAdditionalneeds("Breakfast");
 
         Response response = given()
-                .body(jsonBooking)
+                .body(booking)
                 .when()
                 .post(EndPoint.BOOKING)
                 .prettyPeek();
@@ -143,34 +143,32 @@ public class TestSuite extends TestConf {
     @Test
     public void putUpdateBooking() {
 
-        String jsonBooking = new Booking()
+        Booking booking = new Booking()
                 .setFirstname("James")
                 .setLastname("Brown")
                 .setTotalprice(111)
                 .setDepositpaid(true)
-                .setBookingdates("2018-01-01", "2019-01-01")
-                .setAdditionalneeds("Breakfast")
-                .getJsonBooking();
+                .setBookingdates(new Bookingdates("2018-01-01", "2019-01-01"))
+                .setAdditionalneeds("Breakfast");
 
         Response response = given()
-                .body(jsonBooking).pathParam("bookingId", 2)
+                .body(booking).pathParam("bookingId", 2)
                 .cookie("token", auth.getToken())
                 .when()
                 .put(EndPoint.SINGLE_BOOKING)
                 .prettyPeek();
 
         assertThat(response.statusCode(), equalTo(200));
-        assertThat(response.body().prettyPrint(), equalTo(jsonBooking));
     }
 
     @Category(SmokeTest.class)
     @Test
     public void patchUpdateBooking() {
 
-        String jsonBooking = new Booking()
-                .setFirstname("foo")
-                .setLastname("bar")
-                .getJsonBooking();
+        String jsonBooking = "{\n" +
+                "    \"firstname\": \"Foo\",\n" +
+                "    \"lastname\": \"Bar\"\n" +
+                "}";
 
         Response response = given()
                 .body(jsonBooking).pathParam("bookingId", 2)
@@ -190,7 +188,7 @@ public class TestSuite extends TestConf {
 
         Response response = given()
                 .cookie("token", auth.getToken())
-                .pathParam("bookingId", 10)
+                .pathParam("bookingId", 8)
                 .when()
                 .delete(EndPoint.SINGLE_BOOKING)
                 .prettyPeek();

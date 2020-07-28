@@ -1,59 +1,64 @@
 package model;
 
 public class Booking {
+    private String firstname;
+    private String lastname;
+    private float totalprice;
+    private boolean depositpaid;
+    private Bookingdates bookingdatesObject;
+    private String additionalneeds;
 
-    private String firstname = "";
-    private String lastname = "";
-    private String totalprice = "";
-    private String depositpaid = "";
-    private String bookingdates = "";
-    private String checkin = "";
-    private String checkout = "";
-    private String additionalneeds = "";
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    public float getTotalprice() {
+        return totalprice;
+    }
+
+    public boolean getDepositpaid() {
+        return depositpaid;
+    }
+
+    public Bookingdates getBookingdates() {
+        return bookingdatesObject;
+    }
+
+    public String getAdditionalneeds() {
+        return additionalneeds;
+    }
 
     public Booking setFirstname(String firstname) {
-        this.firstname = "    \"firstname\": \"" + firstname + "\",\n";
+        this.firstname = firstname;
         return this;
     }
 
     public Booking setLastname(String lastname) {
-        this.lastname = "    \"lastname\": \"" + lastname + "\",\n";
+        this.lastname = lastname;
         return this;
     }
 
-    public Booking setTotalprice(int totalprice) {
-        this.totalprice = "    \"totalprice\": " + totalprice + ",\n";
+    public Booking setTotalprice(float totalprice) {
+        this.totalprice = totalprice;
         return this;
     }
 
     public Booking setDepositpaid(boolean depositpaid) {
-        this.depositpaid = "    \"depositpaid\": " + depositpaid + ",\n";
+        this.depositpaid = depositpaid;
         return this;
     }
 
-    public Booking setBookingdates(String checkin, String checkout) {
-        this.checkin = "        \"checkin\": \"" + checkin + "\",\n";
-        this.checkout = "        \"checkout\": \"" + checkout + "\"\n";
-        bookingdates = "    \"bookingdates\": {\n" +
-                this.checkin + this.checkout +
-                "    },\n";
+    public Booking setBookingdates(Bookingdates bookingdatesObject) {
+        this.bookingdatesObject = bookingdatesObject;
         return this;
     }
 
     public Booking setAdditionalneeds(String additionalneeds) {
-        this.additionalneeds = "    \"additionalneeds\": \"" + additionalneeds + "\",\n";
+        this.additionalneeds = additionalneeds;
         return this;
-    }
-
-    public String getJsonBooking() {
-        String result = "{\n" +
-                firstname +
-                lastname +
-                totalprice +
-                depositpaid +
-                bookingdates +
-                additionalneeds +
-                "}";
-        return result.replace(",\n}", "\n}");
     }
 }

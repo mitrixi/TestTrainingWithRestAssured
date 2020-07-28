@@ -3,7 +3,6 @@ package config;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
-import io.restassured.filter.log.LogDetail;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import org.junit.BeforeClass;
@@ -45,7 +44,7 @@ public class TestConf {
     public static void setup() {
 
         urlParam_requestSpec = new RequestSpecBuilder()
-                .setBaseUri(System.getProperty("url"))
+                .setBaseUri(System.getProperty("url") + "")
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Accept", "application/json")
                 .build();

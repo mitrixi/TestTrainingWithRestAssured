@@ -24,4 +24,6 @@ dependencies {
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.1'
     compile group: 'io.rest-assured', name: 'json-schema-validator', version: '4.3.1'
     compile 'com.github.scribejava:scribejava-apis:6.9.0'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.11.1'
+    compile 'org.projectlombok:lombok:1.18.12'
 }

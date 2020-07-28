@@ -14,10 +14,11 @@ public class Login {
         return this;
     }
 
-    public String getJson() {
-        return "{\n" +
-                "    \"username\" : \"" + username + "\",\n " +
-                "    \"password\" : \"" + password + "\"\n" +
-                "}";
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
     }
 }

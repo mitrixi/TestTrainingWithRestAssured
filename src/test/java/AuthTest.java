@@ -6,13 +6,12 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import service.Auth;
 
-import static io.restassured.RestAssured.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 public class AuthTest extends TestConf {
 
-    Auth auth = new Auth(requestSpecification);
+    Auth auth = new Auth();
 
     @Category(SmokeTest.class)
     @Test
